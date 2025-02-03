@@ -6,9 +6,9 @@ setBackgroundColour("black")
 
 
 
-mass_multiplier = 0.5
+mass_multiplier = 0.2
 
-rotation_speed = 1
+rotation_speed = 10
 min_speed = 1
 max_speed = 10
 
@@ -45,7 +45,7 @@ class Enemy(Creature):
         self.y = self.y % 1000
         self.x = self.x % 1000
         
-        moveSprite(self.sprite, self.x, self.y)
+        moveSprite(self.sprite, self.x, self.y,centre=True)
         
     def update(self):
     
@@ -62,17 +62,33 @@ class Player(Creature):
         
     def move(self):
         
-        self.y += math.sin(math.radians(self.direction)) * self.speed
-        self.x += math.cos(math.radians(self.direction)) * self.speed
+        if keyPressed("w"):
         
-        if keyPressed("a"):
-            direction = 365 % (direction - rotation_speed)
-            
-        if keyPressed("d"):
-            direction = 365 % (direction + rotation_speed)
+            self.y += math.sin(math.radians(self.direction)) * self.speed
+            self.x += math.cos(math.radians(self.direction)) * self.speed
         
-        moveSprite(self.sprite, self.x, self.y)
+        dy = mouseY() - self.y
+        dx = mouseX() - self.x
+        
+        distance = math.sqrt((dy)*(dy) + (dx*dx))
+        
+        self.speed = (distance/200) * 10
+        if self.speed > max_speed:
+            self.speed = max_speed
+
+        self.direction = math.degrees(math.atan2(dy,dx))
+        
+        for c in enemy_list:
+            if touching(self.sprite,c.sprite):
+                
+                if self.size > c.size:
+                    enemy_list.remove(c)
+                    hideSprite(c.sprite)
+                    self.size += c.size * mass_multiplier
+        
+        moveSprite(self.sprite, self.x, self.y,centre=True)
         transformSprite(self.sprite,self.direction,self.size/100)
+    
     
     def update(self):
         self.move()
@@ -87,7 +103,7 @@ while game_active:
     
     for enemy in enemy_list:
         enemy.update()
-    player.move()
+    player.update()
     
     
     updateDisplay()
