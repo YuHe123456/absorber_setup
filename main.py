@@ -36,11 +36,16 @@ class Creature:
         
 
 class Enemy(Creature):
-    def __init__(self,global_x, global_y,image,  size):
+    def __init__(self,global_x, global_y,image,  size, test=False):
         super().__init__(global_x, global_y, image,  size)
         
         self.direction = random.randint(0,359)
-        self.speed = random.randint(min_speed, max_speed)
+        
+        if not test:
+            self.speed = random.randint(min_speed, max_speed)
+            
+        else:
+            self.speed = 0
         
         hideSprite(self.sprite)
         
@@ -132,12 +137,15 @@ class Player(Creature):
     
     def update(self):
         self.move()
+        
     
 setAutoUpdate(False)
  
 
 enemy_list = [Enemy(random.randint(0,10000),random.randint(0,10000), "enemy.png", random.randint(10,100)) for i in range(200)]
 player = Player(5000,5000,"player.png",20)
+
+
 
 while game_active:
     
